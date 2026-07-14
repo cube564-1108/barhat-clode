@@ -1,0 +1,72 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Bash(npm:*)",
+      "Bash(node:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pip:*)",
+      "Bash(pip3:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(cat:*)",
+      "Bash(wc:*)",
+      "Bash(echo:*)"
+    ],
+    "deny": [
+      {
+        "tool": "Bash",
+        "prompt": "rm -rf|rm.*-r|-rf|rmdir.*-rf|del /s/q|rm.*\\*.*rm|find.*-delete|find.*-exec.*rm"
+      },
+      {
+        "tool": "Bash",
+        "prompt": "export.*curl|curl.*\\$\\{|curl.*--data.*\\$|curl.*-d.*\\$"
+      },
+      {
+        "tool": "Bash",
+        "prompt": "wget.*\\$|wget.*\\$\\{|wget.*--post-data.*\\$"
+      },
+      {
+        "tool": "Read",
+        "prompt": "\\.env|\\.env\\.|secrets?|keys?|passwords?|credentials"
+      },
+      {
+        "tool": "Bash",
+        "prompt": "cat.*\\.env|grep.*\\.env|less.*\\.env|more.*\\.env|head.*\\.env|tail.*\\.env"
+      },
+      {
+        "tool": "Bash",
+        "prompt": "echo.*\\$.*\\|.*curl|echo.*\\$.*>.*\\.(sh|bash|curl|wget)|printenv.*\\|.*curl"
+      }
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Ping.aiff"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Tink.aiff"
+          }
+        ]
+      }
+    ]
+  }
+}

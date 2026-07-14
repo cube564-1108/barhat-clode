@@ -1,0 +1,514 @@
+{
+  "id": 1327961,
+  "name": "Оценка качества сборки букетов",
+  "deleted_or_closed": false,
+  "folder": [
+    "Оценка качества сборки букетов"
+  ],
+  "steps": {
+    "1": ""
+  },
+  "fields": [
+    {
+      "id": 21,
+      "type": "author",
+      "name": "Автор",
+      "tooltip": ""
+    },
+    {
+      "id": 1,
+      "type": "creation_date",
+      "name": "Дата создания",
+      "tooltip": ""
+    },
+    {
+      "id": 10,
+      "type": "multiple_choice",
+      "name": "Салон",
+      "tooltip": "",
+      "default_value": "0",
+      "info": {
+        "is_form_title": true,
+        "large_view": false,
+        "options": [
+          {
+            "choice_id": 0,
+            "choice_value": "Не выбрано"
+          },
+          {
+            "choice_id": 1,
+            "choice_value": "НСК БХ"
+          },
+          {
+            "choice_id": 2,
+            "choice_value": "НСК ЖД"
+          },
+          {
+            "choice_id": 3,
+            "choice_value": "НСК Левый"
+          },
+          {
+            "choice_id": 4,
+            "choice_value": "Томск ДК"
+          },
+          {
+            "choice_id": 5,
+            "choice_value": "ЕКБ Бажова"
+          },
+          {
+            "choice_id": 6,
+            "choice_value": "ЕКБ Белинского"
+          },
+          {
+            "choice_id": 7,
+            "choice_value": "БРН Совесткая"
+          },
+          {
+            "choice_id": 8,
+            "choice_value": "БРН Лазурная"
+          },
+          {
+            "choice_id": 9,
+            "choice_value": "Челябинск Цвиллинга"
+          },
+          {
+            "choice_id": 10,
+            "choice_value": "НСК Восход"
+          },
+          {
+            "choice_id": 11,
+            "choice_value": "Томск Фрунзе"
+          },
+          {
+            "choice_id": 12,
+            "choice_value": "Челябинск Свердловскй"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "type": "multiple_choice",
+      "name": "Флорист",
+      "tooltip": "",
+      "default_value": "0",
+      "info": {
+        "is_form_title": true,
+        "large_view": false,
+        "options": [
+          {
+            "choice_id": 0,
+            "choice_value": "Не выбрано"
+          },
+          {
+            "choice_id": 1,
+            "choice_value": "Флорист 1"
+          },
+          {
+            "choice_id": 2,
+            "choice_value": "Флорист 2"
+          },
+          {
+            "choice_id": 3,
+            "choice_value": "Флорист 3"
+          },
+          {
+            "choice_id": 4,
+            "choice_value": "Флорист 4"
+          },
+          {
+            "choice_id": 5,
+            "choice_value": "Флорист 5"
+          },
+          {
+            "choice_id": 6,
+            "choice_value": "Флорист 6"
+          },
+          {
+            "choice_id": 7,
+            "choice_value": "Флорист 7"
+          },
+          {
+            "choice_id": 8,
+            "choice_value": "Флорист 8"
+          },
+          {
+            "choice_id": 9,
+            "choice_value": "Флорист 9"
+          },
+          {
+            "choice_id": 10,
+            "choice_value": "Флорист 10"
+          },
+          {
+            "choice_id": 11,
+            "choice_value": "флорист 11"
+          },
+          {
+            "choice_id": 12,
+            "choice_value": "флорист 12"
+          },
+          {
+            "choice_id": 13,
+            "choice_value": "флорист 13"
+          },
+          {
+            "choice_id": 14,
+            "choice_value": "флорист 14"
+          },
+          {
+            "choice_id": 15,
+            "choice_value": "флорист 15"
+          },
+          {
+            "choice_id": 16,
+            "choice_value": "флорист 16"
+          },
+          {
+            "choice_id": 17,
+            "choice_value": "флорист 17"
+          },
+          {
+            "choice_id": 18,
+            "choice_value": "флорист 18"
+          },
+          {
+            "choice_id": 19,
+            "choice_value": "флорист 19"
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "type": "text",
+      "name": "Номер заказа",
+      "tooltip": ""
+    },
+    {
+      "id": 22,
+      "type": "text",
+      "name": "Артикул оцениваемого товара",
+      "tooltip": ""
+    },
+    {
+      "id": 6,
+      "type": "multiple_choice",
+      "name": "Вид заказа",
+      "tooltip": "",
+      "default_value": "0",
+      "info": {
+        "large_view": false,
+        "options": [
+          {
+            "choice_id": 0,
+            "choice_value": "Не выбрано"
+          },
+          {
+            "choice_id": 1,
+            "choice_value": "Клубничный букет"
+          },
+          {
+            "choice_id": 2,
+            "choice_value": "Цветочный букет"
+          },
+          {
+            "choice_id": 3,
+            "choice_value": "Клубнично-цветочный букет"
+          },
+          {
+            "choice_id": 4,
+            "choice_value": "Клубничный бокс"
+          },
+          {
+            "choice_id": 5,
+            "choice_value": "Цветочный бокс"
+          },
+          {
+            "choice_id": 6,
+            "choice_value": "Коробочка с клубникой или бананами"
+          },
+          {
+            "choice_id": 7,
+            "choice_value": "Цветочно-клубничный бокс"
+          },
+          {
+            "choice_id": 8,
+            "choice_value": "Коробочка+цветочный букет"
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "type": "multiple_choice",
+      "name": "Соответствие каталогу",
+      "tooltip": "",
+      "info": {
+        "large_view": false,
+        "options": [
+          {
+            "choice_id": 0,
+            "choice_value": "Не выбрано"
+          },
+          {
+            "choice_id": 3,
+            "choice_value": "0"
+          },
+          {
+            "choice_id": 1,
+            "choice_value": "1"
+          },
+          {
+            "choice_id": 2,
+            "choice_value": "2"
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "type": "multiple_choice",
+      "name": "Аккуратность упаковки",
+      "tooltip": "",
+      "info": {
+        "large_view": false,
+        "options": [
+          {
+            "choice_id": 0,
+            "choice_value": "Не выбрано"
+          },
+          {
+            "choice_id": 1,
+            "choice_value": "0"
+          },
+          {
+            "choice_id": 2,
+            "choice_value": "1"
+          },
+          {
+            "choice_id": 3,
+            "choice_value": "2"
+          }
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "type": "multiple_choice",
+      "name": "Оформление клубники",
+      "tooltip": "",
+      "info": {
+        "large_view": false,
+        "options": [
+          {
+            "choice_id": 0,
+            "choice_value": "Не выбрано"
+          },
+          {
+            "choice_id": 1,
+            "choice_value": "0"
+          },
+          {
+            "choice_id": 2,
+            "choice_value": "1"
+          },
+          {
+            "choice_id": 3,
+            "choice_value": "2"
+          }
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "type": "multiple_choice",
+      "name": "Обработка цветка",
+      "tooltip": "",
+      "info": {
+        "large_view": false,
+        "options": [
+          {
+            "choice_id": 0,
+            "choice_value": "Не выбрано"
+          },
+          {
+            "choice_id": 1,
+            "choice_value": "0"
+          },
+          {
+            "choice_id": 2,
+            "choice_value": "1"
+          },
+          {
+            "choice_id": 3,
+            "choice_value": "2"
+          }
+        ]
+      }
+    },
+    {
+      "id": 23,
+      "type": "multiple_choice",
+      "name": "Свежесть компонентов",
+      "tooltip": "",
+      "default_value": "0",
+      "info": {
+        "large_view": false,
+        "options": [
+          {
+            "choice_id": 0,
+            "choice_value": "Не выбрано"
+          },
+          {
+            "choice_id": 1,
+            "choice_value": "0"
+          },
+          {
+            "choice_id": 2,
+            "choice_value": "1"
+          },
+          {
+            "choice_id": 3,
+            "choice_value": "2"
+          }
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "type": "multiple_choice",
+      "name": "Техника сборки",
+      "tooltip": "",
+      "info": {
+        "large_view": false,
+        "options": [
+          {
+            "choice_id": 0,
+            "choice_value": "Не выбрано"
+          },
+          {
+            "choice_id": 1,
+            "choice_value": "0"
+          },
+          {
+            "choice_id": 2,
+            "choice_value": "1"
+          },
+          {
+            "choice_id": 3,
+            "choice_value": "2"
+          }
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "type": "multiple_choice",
+      "name": "Клубника отделена от цветка прозрачной пленкой",
+      "tooltip": "",
+      "info": {
+        "large_view": false,
+        "options": [
+          {
+            "choice_id": 0,
+            "choice_value": "Не выбрано"
+          },
+          {
+            "choice_id": 1,
+            "choice_value": "0"
+          },
+          {
+            "choice_id": 2,
+            "choice_value": "1"
+          },
+          {
+            "choice_id": 3,
+            "choice_value": "2"
+          }
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "type": "multiple_choice",
+      "name": "Соответствие правилам вложения материалов",
+      "tooltip": "",
+      "default_value": "0",
+      "info": {
+        "large_view": false,
+        "options": [
+          {
+            "choice_id": 0,
+            "choice_value": "Не выбрано"
+          },
+          {
+            "choice_id": 1,
+            "choice_value": "0"
+          },
+          {
+            "choice_id": 2,
+            "choice_value": "1"
+          },
+          {
+            "choice_id": 3,
+            "choice_value": "2"
+          }
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "type": "multiple_choice",
+      "name": "Фотография",
+      "tooltip": "",
+      "info": {
+        "large_view": false,
+        "options": [
+          {
+            "choice_id": 0,
+            "choice_value": "Не выбрано"
+          },
+          {
+            "choice_id": 1,
+            "choice_value": "0"
+          },
+          {
+            "choice_id": 2,
+            "choice_value": "1"
+          },
+          {
+            "choice_id": 3,
+            "choice_value": "2"
+          }
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "type": "text",
+      "name": "Комментарии",
+      "tooltip": "",
+      "info": {
+        "multiline": true
+      }
+    },
+    {
+      "id": 18,
+      "type": "number",
+      "name": "Итоговая оценка",
+      "tooltip": "",
+      "info": {
+        "is_form_title": true,
+        "decimal_places": 0,
+        "show_sum": false
+      }
+    },
+    {
+      "id": 19,
+      "type": "file",
+      "name": "Файлы",
+      "tooltip": ""
+    }
+  ]
+}

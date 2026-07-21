@@ -19,9 +19,15 @@ pip install -r requirements.txt
 
 3. Настроить переменные окружения:
 ```bash
-cp .env.example .env
-# редактировать .env с реальными значениями
+# Отредактируйте .env файл и заполните реальные значения:
+PYRUS_LOGIN=your_email@pyrus.com
+PYRUS_ACCESS_TOKEN=your_security_key
 ```
+
+**Получение PYRUS_ACCESS_TOKEN:**
+- Войти в Pyrus
+- Настройки → Интеграция → API
+- Скопировать Security Key
 
 ## Запуск
 

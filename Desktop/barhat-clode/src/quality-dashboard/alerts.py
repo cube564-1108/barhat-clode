@@ -115,6 +115,11 @@ class AlertManager:
         """Детектирует новых флористов с низким баллом"""
         alerts = []
 
+        if filters is None:
+            filters = {}
+        """Детектирует новых флористов с низким баллом"""
+        alerts = []
+
         tasks = self.db.get_tasks(
             date_from=filters.get('date_from'),
             date_to=filters.get('date_to'),

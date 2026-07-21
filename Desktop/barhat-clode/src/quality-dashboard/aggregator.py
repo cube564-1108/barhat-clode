@@ -74,14 +74,16 @@ class DataAggregator:
 
         # Общая статистика
         total_orders = len(tasks)
-        total_score = sum(t.get('total_score') or 0 for t in tasks)
+        total_score = sum(t.get('total_score') for t in tasks if t.get('total_score') is not None)
         avg_score = round(total_score / total_orders, 2) if total_orders > 0 else 0
 
         # Идеальные заказы (балл >= 17 для 18-бальных, >= 13 для 14-бальных)
         perfect_count = 0
         for task in tasks:
             max_score = task.get('max_score', 14)
-            total = task.get('total_score', 0)
+            total = task.get('total_score')
+            if total is None:
+                continue
             if max_score == 18 and total >= 17:
                 perfect_count += 1
             elif max_score == 14 and total >= 13:

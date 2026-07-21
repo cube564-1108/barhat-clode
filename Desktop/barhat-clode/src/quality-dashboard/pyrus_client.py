@@ -1,6 +1,8 @@
 """
 Quality Dashboard — Pyrus API Client
 https://pyrus.com/ru/help/api
+
+Авторизация: login + security_key (не Bearer токен!)
 """
 
 import os
@@ -25,9 +27,11 @@ logger = logging.getLogger(__name__)
 # ===== Конфигурация =====
 
 PYRUS_API_BASE_URL = "https://api.pyrus.com/v4"
-PYRUS_API_TOKEN = os.getenv("PYRUS_API_TOKEN")
-if not PYRUS_API_TOKEN:
-    raise ValueError("PYRUS_API_TOKEN не установлен в переменных окружения")
+PYRUS_LOGIN = os.getenv("PYRUS_LOGIN")
+PYRUS_ACCESS_TOKEN = os.getenv("PYRUS_ACCESS_TOKEN")
+
+if not PYRUS_LOGIN or not PYRUS_ACCESS_TOKEN:
+    logger.warning("PYRUS_LOGIN и/или PYRUS_ACCESS_TOKEN не заданы")
 
 
 # ===== Типы данных =====
@@ -64,16 +68,57 @@ class PyrusTask:
 # ===== Pyrus API Client =====
 
 class PyrusClient:
-    """Клиент для работы с Pyrus API"""
+    """Клиент для работы с Pyrus API
 
-    def __init__(self, api_token: Optional[str] = None, base_url: str = PYRUS_API_BASE_URL):
-        self.api_token = api_token or PYRUS_API_TOKEN
+    Авторизация через login + security_key (как в pyrus_export.py)
+    """
+
+    def __init__(self, login: Optional[str] = None, security_key: Optional[str] = None, base_url: str = PYRUS_API_BASE_URL):
+        self.login = login or PYRUS_LOGIN
+        self.security_key = security_key or PYRUS_ACCESS_TOKEN
         self.base_url = base_url
         self.session = requests.Session()
-        self.session.headers.update({
-            "Authorization": f"Bearer {self.api_token}",
-            "Content-Type": "application/json"
-        })
+        self.session.trust_env = False
+
+        # Получаем access_token при инициализации
+        self.access_token = None
+        self._authorize()
+
+        # Устанавливаем заголовки с access_token
+        if self.access_token:
+            self.session.headers.update({
+                "Authorization": f"Bearer {self.access_token}",
+                "Content-Type": "application/json"
+            })
+
+    def _authorize(self) -> bool:
+        """Получение access_token через login + security_key
+
+        API: POST /auth
+        """
+        if not self.login or not self.security_key:
+            raise ValueError("PYRUS_LOGIN и PYRUS_ACCESS_TOKEN должны быть заданы")
+
+        try:
+            logger.info(f"Авторизация в Pyrus: {self.login}")
+            response = self.session.post(
+                f"{self.base_url}/auth",
+                headers={"Content-Type": "application/json"},
+                json={"login": self.login, "security_key": self.security_key},
+                timeout=30
+            )
+
+            if response.status_code == 200:
+                self.access_token = response.json().get("access_token")
+                logger.info("✅ Авторизация успешна")
+                return True
+            else:
+                logger.error(f"❌ Ошибка авторизации: {response.status_code} - {response.text}")
+                raise Exception(f"Auth failed: {response.text}")
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"❌ Ошибка запроса авторизации: {e}")
+            raise
 
     def _make_request(
         self,
@@ -119,8 +164,24 @@ class PyrusClient:
                     retry_count += 1
                     continue
 
-                # Обычный ответ
-                if response.status_code == 200:
+                # 401 Unauthorized — токен истек, пробуем переавторизоваться
+                if response.status_code == 401:
+                    logger.warning("Токен истек, пробуем переавторизоваться...")
+                    try:
+                        self._authorize()
+                        self.session.headers.update({
+                            "Authorization": f"Bearer {self.access_token}"
+                        })
+                        retry_count += 1
+                        continue
+                    except Exception as e:
+                        return PyrusResponse(success=False, data=None, error=f"Re-auth failed: {e}")
+
+                # Обычный ответ (200 или 202 для Pyrus)
+                if response.status_code in (200, 202):
+                    # 202 может вернуть пустой ответ
+                    if response.status_code == 202 and not response.content:
+                        return PyrusResponse(success=True, data=None)
                     data = response.json()
                     return PyrusResponse(
                         success=True,
@@ -133,7 +194,7 @@ class PyrusClient:
                 else:
                     error_msg = f"HTTP {response.status_code}: {response.text}"
                     logger.error(error_msg)
-                    return PyrusResponse(success=False, error=error_msg)
+                    return PyrusResponse(success=False, data=None, error=error_msg)
 
             except requests.exceptions.Timeout:
                 last_error = "Request timeout"
@@ -142,10 +203,10 @@ class PyrusClient:
             except requests.exceptions.RequestException as e:
                 last_error = str(e)
                 logger.error(f"Request error: {e}")
-                return PyrusResponse(success=False, error=str(e))
+                return PyrusResponse(success=False, data=None, error=str(e))
 
         # Все retry попытки исчерпаны
-        return PyrusResponse(success=False, error=last_error or "Max retries exceeded")
+        return PyrusResponse(success=False, data=None, error=last_error or "Max retries exceeded")
 
     def get_form_structure(self, form_id: int) -> PyrusResponse:
         """Получить структуру формы (поля и их типы)
@@ -182,9 +243,6 @@ class PyrusClient:
         logger.info(f"Получение реестра формы {form_id}")
 
         response = self._make_request("GET", f"forms/{form_id}/register")
-        if not response.success:
-            return response
-
         return response
 
     def get_form_tasks(
@@ -281,22 +339,26 @@ class PyrusClient:
 
 if __name__ == "__main__":
     # Пример использования
-    client = PyrusClient()
+    try:
+        client = PyrusClient()
 
-    # Проверка соединения
-    if client.test_connection():
-        print("✅ Соединение с Pyrus API установлено")
-    else:
-        print("❌ Ошибка соединения с Pyrus API")
+        # Проверка соединения
+        if client.test_connection():
+            print("✅ Соединение с Pyrus API установлено")
+        else:
+            print("❌ Ошибка соединения с Pyrus API")
+            exit(1)
+
+        # Получение структуры формы
+        form_id = 1327961
+        form_response = client.get_form_structure(form_id)
+
+        if form_response.success:
+            print(f"\n📋 Поля формы {form_id}:")
+            for field in form_response.data:
+                print(f"  - {field.name} (ID: {field.id}, Тип: {field.type})")
+        else:
+            print(f"❌ Ошибка получения структуры формы: {form_response.error}")
+    except Exception as e:
+        print(f"❌ Ошибка: {e}")
         exit(1)
-
-    # Получение структуры формы
-    form_id = 1327961
-    form_response = client.get_form_structure(form_id)
-
-    if form_response.success:
-        print(f"\n📋 Поля формы {form_id}:")
-        for field in form_response.data:
-            print(f"  - {field.name} (ID: {field.id}, Тип: {field.type})")
-    else:
-        print(f"❌ Ошибка получения структуры формы: {form_response.error}")

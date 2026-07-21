@@ -1,0 +1,25 @@
+# Quality Dashboard — requirements.txt
+# Python 3.11+
+
+# Flask web framework
+Flask==3.0.0
+Werkzeug==3.0.1
+
+# HTTP requests
+requests==2.31.0
+urllib3==2.1.0
+
+# Environment variables
+python-dotenv==1.0.0
+
+# Database
+# (build-in sqlite3 — no extra packages needed)
+
+# WSGI server for production
+gunicorn==21.2.0
+
+# Data processing (для агрегаций и статистики)
+# pandas==2.1.4  # optional, можно добавить позже
+
+# Logging
+# (build-in logging — no extra packages needed)

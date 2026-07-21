@@ -111,7 +111,7 @@ class DataAggregator:
         }
 
     def _aggregate_by_salons(self, tasks: List[Dict]) -> Dict[str, Dict]:
-        """Агрегация по салонам"""
+        """Агрегация по салонам с разделением на категории 14 и 18 баллов"""
         salons_data = defaultdict(lambda: {
             'orders': [],
             'total_score': 0,
@@ -119,7 +119,10 @@ class DataAggregator:
             'perfect': 0,
             'criteria_sums': defaultdict(int),
             'criteria_counts': defaultdict(int),
-            'categories': defaultdict(lambda: {'count': 0, 'total_score': 0})
+            'categories': defaultdict(lambda: {'count': 0, 'total_score': 0}),
+            # Разделение по максимальному баллу
+            'cat_14': {'total_score': 0, 'count': 0},  # Заказы с max_score = 14
+            'cat_18': {'total_score': 0, 'count': 0},  # Заказы с max_score = 18
         })
 
         for task in tasks:
@@ -134,6 +137,14 @@ class DataAggregator:
             total_score = task.get('total_score') or 0
             max_score = task.get('max_score', 14)
             data['total_score'] += total_score
+
+            # Разделение по категориям (14 vs 18 максимальный балл)
+            if max_score == 18:
+                data['cat_18']['total_score'] += total_score
+                data['cat_18']['count'] += 1
+            else:
+                data['cat_14']['total_score'] += total_score
+                data['cat_14']['count'] += 1
 
             # Идеальные заказы
             if max_score == 18 and total_score >= 17:
@@ -195,6 +206,13 @@ class DataAggregator:
 
             status = get_quality_status(normalized_avg, 14)
 
+            # Категории по максимальному баллу (14 vs 18)
+            cat_14_avg = round(data['cat_14']['total_score'] / data['cat_14']['count'], 2) if data['cat_14']['count'] > 0 else 0
+            cat_14_pct = round((cat_14_avg / 14) * 100, 1) if data['cat_14']['count'] > 0 else 0
+
+            cat_18_avg = round(data['cat_18']['total_score'] / data['cat_18']['count'], 2) if data['cat_18']['count'] > 0 else 0
+            cat_18_pct = round((cat_18_avg / 18) * 100, 1) if data['cat_18']['count'] > 0 else 0
+
             result[salon] = {
                 'salon': salon,
                 'avg_score': avg_score,
@@ -205,7 +223,18 @@ class DataAggregator:
                 'status_label': get_status_label(status),
                 'status_class': get_status_class(status),
                 'criteria': criteria_stats,
-                'categories': categories
+                'categories': categories,
+                # Категории по максимальному баллу
+                'cat_14': {
+                    'avg_score': cat_14_avg,
+                    'percentage': cat_14_pct,
+                    'count': data['cat_14']['count']
+                },
+                'cat_18': {
+                    'avg_score': cat_18_avg,
+                    'percentage': cat_18_pct,
+                    'count': data['cat_18']['count']
+                }
             }
 
         return result

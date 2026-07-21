@@ -436,7 +436,8 @@
                             <tr>
                                 <th>#</th>
                                 <th>Салон</th>
-                                <th>Средний балл</th>
+                                <th>Категория 14</th>
+                                <th>Категория 18</th>
                                 <th>Заказов</th>
                                 <th>Эталонных</th>
                                 <th>Статус</th>
@@ -509,6 +510,12 @@
             showLoading(true);
 
             try {
+                // Загружаем месячные периоды
+                const periodsResponse = await fetchAPI('/api/periods');
+                if (periodsResponse.success) {
+                    populatePeriods(periodsResponse.data);
+                }
+
                 // Загружаем опции фильтров
                 const filtersResponse = await fetchAPI('/api/filters/options');
                 if (filtersResponse.success) {
@@ -558,10 +565,24 @@
 
                 response.data.forEach((salon, index) => {
                     const row = document.createElement('tr');
+
+                    // Форматирование данных для категорий
+                    const cat14 = salon.cat_14 || {avg_score: 0, percentage: 0, count: 0};
+                    const cat18 = salon.cat_18 || {avg_score: 0, percentage: 0, count: 0};
+
+                    const cat14Display = cat14.count > 0
+                        ? `<strong>${cat14.avg_score}</strong> <small style="opacity:0.6">(${cat14.percentage}%)</small><br><small>${cat14.count} зак.</small>`
+                        : '<span style="opacity:0.4">—</span>';
+
+                    const cat18Display = cat18.count > 0
+                        ? `<strong>${cat18.avg_score}</strong> <small style="opacity:0.6">(${cat18.percentage}%)</small><br><small>${cat18.count} зак.</small>`
+                        : '<span style="opacity:0.4">—</span>';
+
                     row.innerHTML = `
                         <td>${index + 1}</td>
                         <td>${salon.salon}</td>
-                        <td><strong>${salon.avg_score.toFixed(2)}</strong></td>
+                        <td>${cat14Display}</td>
+                        <td>${cat18Display}</td>
                         <td>${salon.count}</td>
                         <td>${salon.perfect}</td>
                         <td><span class="badge ${salon.status_class}">${salon.status_emoji} ${salon.status_label}</span></td>
@@ -642,16 +663,20 @@
         }
 
         // ===== Filters =====
-        function populateFilters(data) {
-            // Period
+        function populatePeriods(months) {
             const periodSelect = document.getElementById('periodSelect');
-            data.periods.forEach(period => {
+            // Очищаем кроме первого элемента "Все время"
+            periodSelect.innerHTML = '<option value="">Все время</option>';
+
+            months.forEach(month => {
                 const option = document.createElement('option');
-                option.value = period;
-                option.textContent = period;
+                option.value = month.value;
+                option.textContent = month.label;
                 periodSelect.appendChild(option);
             });
+        }
 
+        function populateFilters(data) {
             // Salon
             const salonSelect = document.getElementById('salonSelect');
             data.salons.forEach(salon => {

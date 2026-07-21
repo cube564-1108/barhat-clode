@@ -8,6 +8,10 @@ import logging
 from datetime import datetime
 from typing import Dict, Optional
 
+# Загружаем .env переменные
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import Flask, render_template, jsonify, request
 
 from database import DatabaseManager
@@ -45,7 +49,16 @@ app.config['SECRET_KEY'] = SECRET_KEY
 db = DatabaseManager()
 aggregator = DataAggregator(db)
 alert_manager = AlertManager(db)
-pyrus_client = PyrusClient()
+
+# PyrusClient будет инициализирован лениво при необходимости
+pyrus_client = None
+
+def get_pyrus_client():
+    """Ленивая инициализация PyrusClient"""
+    global pyrus_client
+    if pyrus_client is None:
+        pyrus_client = PyrusClient()
+    return pyrus_client
 
 
 # ===== Middleware =====
@@ -286,11 +299,31 @@ def filter_options():
         }), 500
 
 
+@app.route('/api/periods')
+def periods():
+    """Месячные периоды для фильтра"""
+    try:
+        months = db.get_distinct_months()
+        return jsonify({
+            'success': True,
+            'data': months
+        })
+    except Exception as e:
+        logger.error(f"Error in /api/periods: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
 @app.route('/api/refresh', methods=['POST'])
 def refresh():
     """Обновить данные из Pyrus"""
     try:
         logger.info("Запуск обновления данных из Pyrus...")
+
+        # Ленивая инициализация PyrusClient
+        client = get_pyrus_client()
 
         # TODO: Реализовать полную логику обновления
         # 1. Загрузить задачи из Pyrus
@@ -315,6 +348,9 @@ def sync():
     """Полная синхронизация с Pyrus"""
     try:
         logger.info("Запуск полной синхронизации с Pyrus...")
+
+        # Ленивая инициализация PyrusClient
+        client = get_pyrus_client()
 
         # TODO: Реализовать полную логику синхронизации
         # Это будет основной endpoint для cron

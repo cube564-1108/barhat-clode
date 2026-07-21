@@ -257,13 +257,37 @@ class DatabaseManager:
             return []
 
     def get_distinct_periods(self) -> List[str]:
-        """Получить список уникальных периодов"""
+        """Получить список уникальных периодов (месяц год)"""
         try:
             with self.get_connection() as conn:
-                cursor = conn.execute("SELECT DISTINCT period FROM tasks WHERE period IS NOT NULL ORDER BY period DESC")
+                cursor = conn.execute("SELECT DISTINCT period FROM tasks WHERE period IS NOT NULL AND period != '' ORDER BY created_at DESC")
                 return [row["period"] for row in cursor.fetchall()]
         except Exception as e:
             logger.error(f"Ошибка получения периодов: {e}")
+            return []
+
+    def get_distinct_months(self) -> List[Dict[str, str]]:
+        """Получить список уникальных месяцев с данными
+
+        Returns:
+            List[Dict]: [{'value': 'Июль 2026', 'label': 'Июль 2026'}, ...]
+            отсортировано от последнего к первему
+        """
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.execute("""
+                    SELECT DISTINCT period, MIN(created_at) as first_date
+                    FROM tasks
+                    WHERE period IS NOT NULL AND period != ''
+                    GROUP BY period
+                    ORDER BY first_date DESC
+                """)
+                periods = [row["period"] for row in cursor.fetchall()]
+
+                # Формируем список с value и label (они одинаковые для этого случая)
+                return [{'value': p, 'label': p} for p in periods]
+        except Exception as e:
+            logger.error(f"Ошибка получения месяцев: {e}")
             return []
 
     def get_distinct_order_types(self) -> List[str]:

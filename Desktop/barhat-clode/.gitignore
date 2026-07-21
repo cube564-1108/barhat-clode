@@ -1,0 +1,48 @@
+# Environment
+.env
+.env.*
+
+# Business context (local only)
+.business/
+
+# Python
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+.venv/
+
+# Node.js
+node_modules/
+.next/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Database (SQLite)
+*.db
+*.sqlite
+*.sqlite3
+
+# Quality Dashboard specific
+quality_dashboard.db
+*_temp/
+*.whl
+*.tar.gz
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+dist/
+build/
+*.egg-info/

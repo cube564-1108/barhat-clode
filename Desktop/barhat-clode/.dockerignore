@@ -34,7 +34,6 @@ quality_dashboard.db
 # Documentation and config (not needed in container)
 CLAUDE.md
 README.md
-*.md
 plans/
 mastery/
 agents/

@@ -202,8 +202,8 @@ class AlertManager:
         salon_stats = stats.get('salons', {})
 
         for salon, data in salon_stats.items():
-            avg_score = data['avg_score']
-            count = data['count']
+            avg_score = data.get('avg_score', 0)
+            count = data.get('count', 0)
 
             # Нормируем к 14
             # Если есть категории, считаем средний max_score

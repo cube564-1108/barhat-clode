@@ -418,9 +418,9 @@ class DataAggregator:
         # Формируем результат
         result = []
         for crit_key, crit_name in QUALITY_CRITERIA.items():
-            data = criteria_data.get(crit_key, {})
-            if data['count'] == 0:
+            if crit_key not in criteria_data:
                 continue
+            data = criteria_data[crit_key]
 
             max_score = CRITERIA_MAX_SCORES[crit_key]
             avg_score = data['total'] / data['count']

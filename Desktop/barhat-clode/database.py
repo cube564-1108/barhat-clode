@@ -27,8 +27,16 @@ logger = logging.getLogger(__name__)
 
 # ===== Пути =====
 
-DATA_DIR = os.path.dirname(os.path.abspath(__file__))
+# Для Amvera и других облачных сервисов используем отдельную директорию для данных
+# Это позволяет монтировать Volume для персистентности
+DATA_DIR = os.environ.get('DATA_DIR', '/app/data')
+
+# Создаём директорию для данных если не существует
+os.makedirs(DATA_DIR, exist_ok=True)
+
 DB_PATH = os.path.join(DATA_DIR, "quality_dashboard.db")
+
+logger.info(f"База данных будет храниться в: {DB_PATH}")
 
 
 # ===== SQL Schema =====

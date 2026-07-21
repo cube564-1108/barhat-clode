@@ -1,23 +1,40 @@
 # Amvera конфигурация для Quality Dashboard
+# Документация: https://docs.amvera.ru/
 
 version: 1
 runtime: python 3.11
 
 build:
   commands:
-    - pip install -r requirements.txt
+    - pip install --no-cache-dir -r requirements.txt
 
 run:
-  command: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
-  # Порты и переменные окружения устанавливаются в Amvera UI
+  command: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120 --access-logfile - --error-logfile -
 
+# Базовые переменные окружения
 environment:
   - FLASK_ENV=production
   - FLASK_DEBUG=0
+  - PYTHONUNBUFFERED=1
 
-# В Amvera UI нужно добавить secrets:
-# - PYRUS_LOGIN
-# - PYRUS_ACCESS_TOKEN
-# - SECRET_KEY
-# - SECRET_HEADER_NAME (опционально)
-# - SECRET_HEADER_VALUE (опционально)
+# Переменные окружения для настройки в Amvera UI (Settings → Environment Variables):
+# === Обязательные ===
+# - PYRUS_LOGIN=your_login
+# - PYRUS_ACCESS_TOKEN=your_token
+# - SECRET_KEY=your_random_secret_key_min_32_chars
+#
+# === Опциональные (для защиты через header) ===
+# - SECRET_HEADER_NAME=X-Secret-Header
+# - SECRET_HEADER_VALUE=your_secret_value
+#
+# === Персистентность данных ===
+# В Amvera настройте mount path для SQLite базы:
+# Mount path: /app/data
+# Это сохранит базу при перезапусках контейнера
+
+# Health check (опционально, если поддерживается Amvera)
+# healthcheck:
+#   path: /api/health
+#   interval: 30s
+#   timeout: 10s
+#   retries: 3

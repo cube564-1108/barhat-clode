@@ -1,0 +1,72 @@
+# .dockerignore for Amvera deployment
+
+# Environment and secrets
+.env
+.env.*
+.business/
+
+# Python cache and venv
+__pycache__/
+*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+**/venv/
+**/.venv/
+*.egg-info/
+dist/
+build/
+
+# Database files (will be created in container)
+*.db
+*.sqlite
+*.sqlite3
+quality_dashboard.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation and config (not needed in container)
+CLAUDE.md
+README.md
+*.md
+plans/
+mastery/
+agents/
+triggers/
+ai-clone/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts from previous deployments
+*.tar.gz
+*_temp/
+
+# Logs
+*.log
+
+# Node.js (if any)
+node_modules/
+
+# Tests
+test_*.py
+*_test.py
+
+# Scripts not needed in production
+install_deps.py
+setup_env.py
+test_pyrus_connection.py
+start.sh  # We'll use amvera.yml commands instead

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Юридический аудит - Бархат</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header .date {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        .score-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .score-card .score {
+            font-size: 5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .score-card .label {
+            font-size: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .progress-bar {
+            background: #eee;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.high { background: linear-gradient(90deg, #11998e, #38ef7d); }
+        .progress-fill.medium { background: linear-gradient(90deg, #f093fb, #f5576c); }
+        .progress-fill.low { background: linear-gradient(90deg, #eb3349, #f45c43); }
+
+        .card p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .issues {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .issues h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .issue-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .issue-item.critical {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+
+        .issue-item.high {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .issue-item.medium {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+
+        .issue-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .issue-content {
+            flex: 1;
+        }
+
+        .issue-content h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .issue-content p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .docs {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .docs h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .doc-link {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .doc-link:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .doc-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+
+        .doc-text h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .doc-text p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .actions {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .actions h2 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .action-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .action-content {
+            flex: 1;
+        }
+
+        .action-content h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .action-content p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .priority {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .priority.critical {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        .priority.high {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+
+        .priority.medium {
+            background: #e8f5e9;
+            color: #4caf50;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .score-card .score {
+                font-size: 3rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Юридический аудит сайта</h1>
+            <p class="date">6 июля 2026 г.</p>
+        </div>
+
+        <div class="score-card">
+            <div class="score">60%</div>
+            <div class="label">Общая оценка соответствия законам РФ</div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>📄 Оферта</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill high" style="width: 70%"></div>
+                </div>
+                <p>70% — Есть основные разделы, но нужна доработка</p>
+            </div>
+
+            <div class="card">
+                <h3>🔒 Политика конфиденциальности</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill medium" style="width: 55%"></div>
+                </div>
+                <p>55% — Базовая структура есть, но не хватает важных элементов</p>
+            </div>
+
+            <div class="card">
+                <h3>✅ Согласие на обработку ПД</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill low" style="width: 20%"></div>
+                </div>
+                <p>20% — Критическая проблема, нет явного согласия</p>
+            </div>
+
+            <div class="card">
+                <h3>🍫 Пищевая маркировка</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill medium" style="width: 40%"></div>
+                </div>
+                <p>40% — Не хватает состава и аллергенов</p>
+            </div>
+        </div>
+
+        <div class="docs">
+            <h2>📚 Найденные документы</h2>
+            <a href="https://barhatflowers.ru/include/offer_detail.php" class="doc-link" target="_blank">
+                <span class="doc-icon">📄</span>
+                <div class="doc-text">
+                    <h4>Публичная оферта</h4>
+                    <p>barhatflowers.ru/include/offer_detail.php</p>
+                </div>
+            </a>
+            <a href="https://barhatflowers.ru/include/licenses_detail.php" class="doc-link" target="_blank">
+                <span class="doc-icon">🔒</span>
+                <div class="doc-text">
+                    <h4>Политика конфиденциальности</h4>
+                    <p>barhatflowers.ru/include/licenses_detail.php</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="issues">
+            <h2>⚠️ Выявленные проблемы</h2>
+
+            <div class="issue-item critical">
+                <span class="issue-icon">🔴</span>
+                <div class="issue-content">
+                    <h4>Нет согласия на обработку персональных данных</h4>
+                    <p>Нарушение ФЗ-152, ответственность до 75 000₽. Нет чекбокса при заказе.</p>
+                </div>
+            </div>
+
+            <div class="issue-item critical">
+                <span class="issue-icon">🔴</span>
+                <div class="issue-content">
+                    <h4>Устаревший email в документах</h4>
+                    <p>Используется sales.barhat@gmail.com вместо актуального.</p>
+                </div>
+            </div>
+
+            <div class="issue-item high">
+                <span class="issue-icon">⚠️</span>
+                <div class="issue-content">
+                    <h4>Цели обработки указаны неполностью</h4>
+                    <p>Нарушение ст. 5 ФЗ-152. Не указаны цели: выполнение договора, доставка, курьеры.</p>
+                </div>
+            </div>
+
+            <div class="issue-item high">
+                <span class="issue-icon">⚠️</span>
+                <div class="issue-content">
+                    <h4>Не указана передача данных курьерам</h4>
+                    <p>Нарушение ст. 6 ФЗ-152. Данные передаются, но это не раскрыто.</p>
+                </div>
+            </div>
+
+            <div class="issue-item high">
+                <span class="issue-icon">⚠️</span>
+                <div class="issue-content">
+                    <h4>Не указан срок хранения данных</h4>
+                    <p>Нарушение ст. 5 ФЗ-152. Нет указания на срок хранения.</p>
+                </div>
+            </div>
+
+            <div class="issue-item high">
+                <span class="issue-icon">⚠️</span>
+                <div class="issue-content">
+                    <h4>Нет прав субъекта ПД</h4>
+                    <p>Нарушение ст. 13-16 ФЗ-152. Не указаны права на доступ, уточнение, удаление.</p>
+                </div>
+            </div>
+
+            <div class="issue-item medium">
+                <span class="issue-icon">📡</span>
+                <div class="issue-content">
+                    <h4>Срок годности не в карточках товаров</h4>
+                    <p>Нарушение ТР ТС 022/2011. Срок указан в оферте, но не виден при заказе.</p>
+                </div>
+            </div>
+
+            <div class="issue-item medium">
+                <span class="issue-icon">📡</span>
+                <div class="issue-content">
+                    <h4>Нет состава и аллергенов</h4>
+                    <p>Нарушение ТР ТС 022/2011. Не указаны аллергены для пищевой продукции.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <h2>🎯 План действий</h2>
+
+            <div class="action-item">
+                <div class="action-number">1</div>
+                <div class="action-content">
+                    <h4>Добавить чекбокс согласия на обработку ПД</h4>
+                    <p>Добавить чекбокс при оформлении заказа с ссылкой на Политику конфиденциальности</p>
+                </div>
+                <span class="priority critical">Критично</span>
+            </div>
+
+            <div class="action-item">
+                <div class="action-number">2</div>
+                <div class="action-content">
+                    <h4>Обновить email на актуальный</h4>
+                    <p>Заменить sales.barhat@gmail.com на sale@new.barhatflowers.ru</p>
+                </div>
+                <span class="priority critical">Критично</span>
+            </div>
+
+            <div class="action-item">
+                <div class="action-number">3</div>
+                <div class="action-content">
+                    <h4>Дополнить цели обработки</h4>
+                    <p>Добавить выполнение договора, доставку, передачу курьерам</p>
+                </div>
+                <span class="priority high">Важно</span>
+            </div>
+
+            <div class="action-item">
+                <div class="action-number">4</div>
+                <div class="action-content">
+                    <h4>Указать передачу данных третьим лицам</h4>
+                    <p>Честно раскрыть кому передаются данные и для чего</p>
+                </div>
+                <span class="priority high">Важно</span>
+            </div>
+
+            <div class="action-item">
+                <div class="action-number">5</div>
+                <div class="action-content">
+                    <h4>Добавить права субъекта ПД</h4>
+                    <p>Добавить раздел о правах на доступ, уточнение, удаление</p>
+                </div>
+                <span class="priority high">Важно</span>
+            </div>
+
+            <div class="action-item">
+                <div class="action-number">6</div>
+                <div class="action-content">
+                    <h4>Указать срок хранения данных</h4>
+                    <p>Добавить конкретный срок (например, 3 года после последнего заказа)</p>
+                </div>
+                <span class="priority high">Важно</span>
+            </div>
+
+            <div class="action-item">
+                <div class="action-number">7</div>
+                <div class="action-content">
+                    <h4>Добавить контакты ответственного</h4>
+                    <p>Указать ФИО, телефон, email ответственного за обработку ПД</p>
+                </div>
+                <span class="priority high">Важно</span>
+            </div>
+
+            <div class="action-item">
+                <div class="action-number">8</div>
+                <div class="action-content">
+                    <h4>Добавить срок годности в карточки</h4>
+                    <p>Указать срок годности в карточках скоропортящихся товаров</p>
+                </div>
+                <span class="priority medium">Желательно</span>
+            </div>
+
+            <div class="action-item">
+                <div class="action-number">9</div>
+                <div class="action-content">
+                    <h4>Добавить состав и аллергены</h4>
+                    <p>Для пищевой продукции указывать состав, пищевую ценность, аллергены</p>
+                </div>
+                <span class="priority medium">Желательно</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

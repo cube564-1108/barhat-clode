@@ -287,7 +287,8 @@ def salons():
             'data': salons_list
         })
     except Exception as e:
-        logger.error(f"Error in /api/salons: {e}")
+        import traceback
+        logger.error(f"Error in /api/salons: {e}\n{traceback.format_exc()}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -332,7 +333,8 @@ def criteria():
             'data': criteria_stats
         })
     except Exception as e:
-        logger.error(f"Error in /api/criteria: {e}")
+        import traceback
+        logger.error(f"Error in /api/criteria: {e}\n{traceback.format_exc()}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -402,7 +404,8 @@ def alerts():
             }
         })
     except Exception as e:
-        logger.error(f"Error in /api/alerts: {e}")
+        import traceback
+        logger.error(f"Error in /api/alerts: {e}\n{traceback.format_exc()}")
         return jsonify({
             'success': False,
             'error': str(e)

@@ -27,8 +27,13 @@ logger = logging.getLogger(__name__)
 
 # ===== Пути =====
 
+# Путь к БД: сначала проверяем переменную окружения, иначе используем дефолтный путь
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(DATA_DIR, "quality_dashboard.db")
+DB_PATH = os.getenv('DATABASE_PATH', os.path.join(DATA_DIR, "quality_dashboard.db"))
+
+# Если путь относительный, делаем его абсолютным от корня проекта
+if not os.path.isabs(DB_PATH):
+    DB_PATH = os.path.abspath(DB_PATH)
 
 
 # ===== SQL Schema =====

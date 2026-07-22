@@ -62,6 +62,91 @@ def get_pyrus_client():
     return pyrus_client
 
 
+def auto_sync_if_needed():
+    """Автоматическая синхронизация если БД пустая"""
+    try:
+        task_count = db.get_task_count()
+        logger.info(f"Текущее количество задач в БД: {task_count}")
+
+        if task_count == 0:
+            logger.warning("БД пуста, запускаю автоматическую синхронизацию с Pyrus...")
+
+            # Проверяем наличие кредов
+            pyrus_login = os.getenv('PYRUS_LOGIN')
+            pyrus_token = os.getenv('PYRUS_ACCESS_TOKEN')
+
+            if not pyrus_login or not pyrus_token:
+                logger.error("PYRUS_LOGIN или PYRUS_ACCESS_TOKEN не заданы! Пропускаю синхронизацию.")
+                return False
+
+            # Ленивая инициализация PyrusClient
+            client = get_pyrus_client()
+
+            # Загружаем задачи из Pyrus
+            form_id = 1327961
+            response = client.get_form_tasks(form_id, max_count=10000)
+
+            if not response.success:
+                logger.error(f"Ошибка загрузки задач: {response.error}")
+                return False
+
+            tasks_data = response.data
+            logger.info(f"Загружено {len(tasks_data)} задач из Pyrus")
+
+            if not tasks_data:
+                logger.warning("Pyrus вернул пустой список задач")
+                return False
+
+            # Парсим и сохраняем задачи
+            saved_count = 0
+            skipped_count = 0
+            error_count = 0
+
+            for task_data in tasks_data:
+                try:
+                    task = parse_pyrus_task(task_data)
+
+                    if not task.salon or not task.florist:
+                        skipped_count += 1
+                        continue
+
+                    if db.save_task(task):
+                        saved_count += 1
+                    else:
+                        error_count += 1
+
+                except Exception as e:
+                    error_count += 1
+                    logger.error(f"Error parsing task {task_data.get('id')}: {e}")
+
+            # Обновляем метаданные
+            db.set_last_sync(datetime.now().isoformat())
+
+            logger.info(f"Автосинхронизация завершена: сохранено {saved_count}, пропущено {skipped_count}, ошибок {error_count}")
+            return True
+
+        else:
+            logger.info("БД содержит данные, синхронизация не требуется")
+            return True
+
+    except Exception as e:
+        logger.error(f"Ошибка при автосинхронизации: {e}")
+        return False
+
+
+# Инициализация БД и автосинхронизация при старте (для gunicorn)
+logger.info("Инициализация БД...")
+try:
+    db.init_db()
+    logger.info("БД инициализирована")
+
+    # Автосинхронизация если пусто (только в production)
+    if not DEBUG:
+        auto_sync_if_needed()
+except Exception as e:
+    logger.error(f"Ошибка при инициализации БД: {e}")
+
+
 def parse_pyrus_task(task_data: dict) -> QualityTask:
     """Парсит задачу из формата Pyrus register в QualityTask"""
 
@@ -524,6 +609,10 @@ if __name__ == '__main__':
     # Инициализация БД
     logger.info("Инициализация БД...")
     db.init_db()
+
+    # Автосинхронизация если пусто (для dev режима)
+    if DEBUG:
+        logger.info("Dev mode: пропускаю автосинхронизацию")
 
     # Запуск приложения
     port = int(os.getenv('PORT', 5000))

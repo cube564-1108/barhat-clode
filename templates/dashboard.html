@@ -510,18 +510,6 @@
             showLoading(true);
 
             try {
-                // Загружаем месячные периоды
-                const periodsResponse = await fetchAPI('/api/periods');
-                if (periodsResponse.success) {
-                    populatePeriods(periodsResponse.data);
-                }
-
-                // Загружаем опции фильтров
-                const filtersResponse = await fetchAPI('/api/filters/options');
-                if (filtersResponse.success) {
-                    populateFilters(filtersResponse.data);
-                }
-
                 // Загружаем данные
                 await Promise.all([
                     loadSummary(),
@@ -539,6 +527,25 @@
                 console.error('Error loading data:', error);
             } finally {
                 showLoading(false);
+            }
+        }
+
+        // Отдельная функция для начальной загрузки опций фильтров
+        async function loadFilterOptions() {
+            try {
+                // Загружаем месячные периоды
+                const periodsResponse = await fetchAPI('/api/periods');
+                if (periodsResponse.success) {
+                    populatePeriods(periodsResponse.data);
+                }
+
+                // Загружаем опции фильтров
+                const filtersResponse = await fetchAPI('/api/filters/options');
+                if (filtersResponse.success) {
+                    populateFilters(filtersResponse.data);
+                }
+            } catch (error) {
+                console.error('Error loading filter options:', error);
             }
         }
 
@@ -665,6 +672,8 @@
         // ===== Filters =====
         function populatePeriods(months) {
             const periodSelect = document.getElementById('periodSelect');
+            // Сохраняем текущее выбранное значение
+            const currentValue = periodSelect.value;
             // Очищаем кроме первого элемента "Все время"
             periodSelect.innerHTML = '<option value="">Все время</option>';
 
@@ -674,6 +683,11 @@
                 option.textContent = month.label;
                 periodSelect.appendChild(option);
             });
+
+            // Восстанавливаем выбранное значение, если он ещё есть в списке
+            if (currentValue && months.some(m => m.value === currentValue)) {
+                periodSelect.value = currentValue;
+            }
         }
 
         function populateFilters(data) {
@@ -725,7 +739,12 @@
         document.getElementById('refreshBtn').addEventListener('click', loadData);
 
         // ===== Init =====
-        document.addEventListener('DOMContentLoaded', loadData);
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Сначала загружаем опции фильтров
+            await loadFilterOptions();
+            // Затем загружаем данные
+            await loadData();
+        });
     </script>
 </body>
 </html>

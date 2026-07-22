@@ -14,6 +14,10 @@ run:
 environment:
   - FLASK_ENV=production
   - FLASK_DEBUG=0
+  - DATABASE_PATH=/data/quality_dashboard.db
+
+# Persistent volume для БД (настраивается в Amvera UI)
+# Mount path: /data
 
 # В Amvera UI нужно добавить secrets:
 # - PYRUS_LOGIN

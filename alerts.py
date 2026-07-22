@@ -209,10 +209,18 @@ class AlertManager:
             # Если есть категории, считаем средний max_score
             if data.get('categories'):
                 from models import MAX_SCORES_BY_ORDER_TYPE
-                avg_max = sum(
-                    MAX_SCORES_BY_ORDER_TYPE.get(c.get('name', ''), 14) * c.get('count', 0)
-                    for c in data['categories'].values()
-                ) / sum(c.get('count', 0) for c in data['categories'].values())
+                categories_items = list(data['categories'].values())
+                if categories_items:
+                    total_count = sum(c.get('count', 0) for c in categories_items if c.get('count', 0) > 0)
+                    if total_count > 0:
+                        avg_max = sum(
+                            MAX_SCORES_BY_ORDER_TYPE.get(c.get('name', ''), 14) * c.get('count', 0)
+                            for c in categories_items
+                        ) / total_count
+                    else:
+                        avg_max = 14
+                else:
+                    avg_max = 14
             else:
                 avg_max = 14
 

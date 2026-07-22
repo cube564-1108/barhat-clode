@@ -200,9 +200,11 @@ class DataAggregator:
             # Нормируем к 14 для консистентности
             normalized_avg = avg_score
             # Если есть разные виды заказов, берем средний max_score
-            if data['categories']:
-                avg_max = sum(MAX_SCORES_BY_ORDER_TYPE.get(c, 14) * d['count'] for c, d in data['categories'].items()) / sum(d['count'] for d in data['categories'].values())
-                normalized_avg = (avg_score / avg_max) * 14 if avg_max > 0 else avg_score
+            if data.get('categories'):
+                items = list(data['categories'].items())
+                if items:
+                    avg_max = sum(MAX_SCORES_BY_ORDER_TYPE.get(c, 14) * d.get('count', 0) for c, d in items) / sum(d.get('count', 0) for c, d in items if d.get('count', 0) > 0)
+                    normalized_avg = (avg_score / avg_max) * 14 if avg_max > 0 else avg_score
 
             status = get_quality_status(normalized_avg, 14)
 
@@ -419,7 +421,7 @@ class DataAggregator:
         result = []
         for crit_key, crit_name in QUALITY_CRITERIA.items():
             data = criteria_data.get(crit_key, {})
-            if data['count'] == 0:
+            if data.get('count', 0) == 0:
                 continue
 
             max_score = CRITERIA_MAX_SCORES[crit_key]

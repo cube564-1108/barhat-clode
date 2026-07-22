@@ -594,6 +594,60 @@ def sync():
         }), 500
 
 
+@app.route('/api/admin/normalize-periods', methods=['POST'])
+def normalize_periods():
+    """Нормализовать периоды в БД к формату ММ.ГГГГ (только для admin)"""
+    try:
+        # Простая защита — проверка SECRET_HEADER
+        if SECRET_HEADER_VALUE:
+            header_value = request.headers.get(SECRET_HEADER_NAME)
+            if header_value != SECRET_HEADER_VALUE:
+                return jsonify({'error': 'Unauthorized'}), 401
+
+        import re
+
+        # Получаем все задачи с периодами
+        tasks = db.get_tasks()
+
+        # Считаем и нормализуем
+        updated = 0
+        for task in tasks:
+            period = task.get('period')
+            if not period:
+                continue
+
+            # Нормализуем
+            if re.match(r'^\d{1}\.\d{4}$', period):
+                # Формат "7.2026" -> "07.2026"
+                parts = period.split('.')
+                if len(parts) == 2:
+                    try:
+                        month = int(parts[0])
+                        year = parts[1]
+                        new_period = f"{month:02d}.{year}"
+                        if new_period != period:
+                            # Обновляем в БД
+                            with db.get_connection() as conn:
+                                conn.execute('UPDATE tasks SET period = ? WHERE task_id = ?', (new_period, task['task_id']))
+                            updated += 1
+                    except:
+                        pass
+
+        logger.info(f"Нормализовано {updated} периодов")
+
+        return jsonify({
+            'success': True,
+            'updated': updated,
+            'message': f'Нормализовано {updated} периодов'
+        })
+    except Exception as e:
+        logger.error(f"Error in /api/admin/normalize-periods: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
 # ===== Helpers =====
 
 def extract_filters(args) -> Dict:

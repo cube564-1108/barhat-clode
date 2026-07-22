@@ -8,7 +8,9 @@ build:
     - pip install -r requirements.txt
 
 run:
-  command: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+  command: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 300
+  # Увеличен timeout до 300 секунд (5 минут) для загрузки 15000+ задач из Pyrus
+  # 1 worker чтобы синхронизация была последовательной
   # Порты и переменные окружения устанавливаются в Amvera UI
 
 environment:

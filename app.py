@@ -183,6 +183,18 @@ def parse_pyrus_task(task_data: dict) -> QualityTask:
     period = values.get(GROUPING_FIELDS['period'], '')
     comment = values.get(GROUPING_FIELDS['comment'], '')
 
+    # Вычисляем период из даты создания, если период не задан в Pyrus
+    if not period and created_date:
+        try:
+            if 'T' in created_date:
+                dt = datetime.fromisoformat(created_date.replace('Z', '+00:00'))
+            else:
+                dt = datetime.strptime(created_date, '%Y-%m-%d')
+            # Формат периода: "7.2026" (месяц.год)
+            period = f"{dt.month}.{dt.year}"
+        except:
+            period = ''
+
     # Извлекаем оценки по критериям
     scores = {}
     total_score = 0

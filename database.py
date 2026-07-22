@@ -275,7 +275,7 @@ class DatabaseManager:
         """Получить список уникальных месяцев с данными
 
         Returns:
-            List[Dict]: [{'value': 'Июль 2026', 'label': 'Июль 2026'}, ...]
+            List[Dict]: [{'value': '7.2026', 'label': 'Июль 2026'}, ...]
             отсортировано от последнего к первему
         """
         try:
@@ -289,8 +289,27 @@ class DatabaseManager:
                 """)
                 periods = [row["period"] for row in cursor.fetchall()]
 
-                # Формируем список с value и label (они одинаковые для этого случая)
-                return [{'value': p, 'label': p} for p in periods]
+                # Названия месяцев
+                month_names = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь',
+                              'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
+
+                # Формируем список с value (числовой формат) и label (русское название)
+                result = []
+                for p in periods:
+                    try:
+                        parts = p.split('.')
+                        if len(parts) == 2:
+                            month_num = int(parts[0])
+                            year = parts[1]
+                            month_name = month_names[month_num - 1] if 1 <= month_num <= 12 else p
+                            label = f"{month_name.capitalize()} {year}"
+                            result.append({'value': p, 'label': label})
+                        else:
+                            result.append({'value': p, 'label': p})
+                    except:
+                        result.append({'value': p, 'label': p})
+
+                return result
         except Exception as e:
             logger.error(f"Ошибка получения месяцев: {e}")
             return []

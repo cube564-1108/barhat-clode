@@ -82,9 +82,9 @@ def auto_sync_if_needed():
             # Ленивая инициализация PyrusClient
             client = get_pyrus_client()
 
-            # Загружаем задачи из Pyrus
+            # Загружаем задачи из Pyrus (увеличиваем лимит для всех задач)
             form_id = 1327961
-            response = client.get_form_tasks(form_id, max_count=10000)
+            response = client.get_form_tasks(form_id, max_count=20000)
 
             if not response.success:
                 logger.error(f"Ошибка загрузки задач: {response.error}")
@@ -519,9 +519,9 @@ def sync():
         # Ленивая инициализация PyrusClient
         client = get_pyrus_client()
 
-        # Загружаем задачи из Pyrus
+        # Загружаем задачи из Pyrus (увеличиваем лимит для всех задач)
         form_id = 1327961
-        response = client.get_form_tasks(form_id, max_count=10000)
+        response = client.get_form_tasks(form_id, max_count=20000)
 
         if not response.success:
             logger.error(f"Ошибка загрузки задач: {response.error}")

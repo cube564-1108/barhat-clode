@@ -97,12 +97,11 @@ def auto_sync_if_needed():
                 logger.warning("Pyrus вернул пустой список задач")
                 return False
 
-            # Парсим и сохраняем задачи
-            saved_count = 0
+            # Парсим задачи (быстро, без сохранения)
+            parsed_tasks = []
             skipped_count = 0
-            error_count = 0
 
-            for i, task_data in enumerate(tasks_data):
+            for task_data in tasks_data:
                 try:
                     task = parse_pyrus_task(task_data)
 
@@ -110,18 +109,18 @@ def auto_sync_if_needed():
                         skipped_count += 1
                         continue
 
-                    if db.save_task(task):
-                        saved_count += 1
-                    else:
-                        error_count += 1
-
-                    # Логируем прогресс каждые 1000 задач
-                    if (i + 1) % 1000 == 0:
-                        logger.info(f"Автосинхронизация прогресс: обработано {i + 1}/{len(tasks_data)} задач, сохранено {saved_count}, пропущено {skipped_count}")
+                    parsed_tasks.append(task)
 
                 except Exception as e:
-                    error_count += 1
                     logger.error(f"Error parsing task {task_data.get('id')}: {e}")
+
+            # Массовое сохранение (один запрос для всех задач)
+            logger.info(f"Автосинхронизация: начинаем сохранение {len(parsed_tasks)} задач...")
+            batch_result = db.save_tasks_batch(parsed_tasks)
+
+            saved_count = batch_result['saved']
+            error_count = batch_result['errors']
+            skipped_count += batch_result['skipped']
 
             # Обновляем метаданные
             db.set_last_sync(datetime.now().isoformat())
@@ -541,12 +540,11 @@ def sync():
         db.clear_all_tasks()
         logger.info("БД очищена от старых данных")
 
-        # Парсим и сохраняем задачи
-        saved_count = 0
+        # Парсим задачи (быстро, без сохранения)
+        parsed_tasks = []
         skipped_count = 0
-        error_count = 0
 
-        for i, task_data in enumerate(tasks_data):
+        for task_data in tasks_data:
             try:
                 task = parse_pyrus_task(task_data)
 
@@ -554,18 +552,23 @@ def sync():
                     skipped_count += 1
                     continue
 
-                if db.save_task(task):
-                    saved_count += 1
-                else:
-                    error_count += 1
-
-                # Логируем прогресс каждые 1000 задач
-                if (i + 1) % 1000 == 0:
-                    logger.info(f"Прогресс: обработано {i + 1}/{len(tasks_data)} задач, сохранено {saved_count}, пропущено {skipped_count}")
+                parsed_tasks.append(task)
 
             except Exception as e:
-                error_count += 1
                 logger.error(f"Error parsing task {task_data.get('id')}: {e}")
+
+        # Массовое сохранение (один запрос для всех задач)
+        logger.info(f"Начинаем сохранение {len(parsed_tasks)} задач в БД...")
+        batch_result = db.save_tasks_batch(parsed_tasks)
+
+        saved_count = batch_result['saved']
+        error_count = batch_result['errors']
+        skipped_count += batch_result['skipped']
+
+        # Обновляем метаданные
+        db.set_last_sync(datetime.now().isoformat())
+
+        logger.info(f"Синхронизация завершена: сохранено {saved_count}, пропущено {skipped_count}, ошибок {error_count}")
 
         # Обновляем метаданные
         db.set_last_sync(datetime.now().isoformat())

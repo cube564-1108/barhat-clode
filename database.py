@@ -178,6 +178,73 @@ class DatabaseManager:
             logger.error(f"Ошибка сохранения задачи {task.task_id}: {e}")
             return False
 
+    def save_tasks_batch(self, tasks: list, form_id: int = PYRUS_FORM_ID) -> dict:
+        """Сохранить множество задач в БД за один запрос (batch insert)
+
+        Args:
+            tasks: список QualityTask
+
+        Returns:
+            dict с результатом: {'saved': X, 'skipped': Y, 'errors': Z}
+        """
+        try:
+            with self.get_connection() as conn:
+                # Подготавливаем данные для вставки
+                data_to_insert = []
+                skipped = 0
+
+                for task in tasks:
+                    if not task.salon or not task.florist:
+                        skipped += 1
+                        continue
+
+                    max_score = MAX_SCORES_BY_ORDER_TYPE.get(task.order_type, 14)
+                    normalized_quality = task.total_score / max_score if task.total_score and max_score > 0 else 0
+
+                    data_to_insert.append((
+                        task.task_id, form_id, task.created_at.isoformat(),
+                        task.salon, task.florist, task.order_type,
+                        task.order_id, task.date, task.period, task.comment,
+                        task.total_score, max_score, normalized_quality,
+                        task.scores.get('catalog_match') if task.scores else None,
+                        task.scores.get('packaging_neatness') if task.scores else None,
+                        task.scores.get('strawberry_design') if task.scores else None,
+                        task.scores.get('flower_processing') if task.scores else None,
+                        task.scores.get('freshness') if task.scores else None,
+                        task.scores.get('assembly_technique') if task.scores else None,
+                        task.scores.get('film_separation') if task.scores else None,
+                        task.scores.get('materials_rules') if task.scores else None,
+                        task.scores.get('photo') if task.scores else None,
+                        datetime.now().isoformat()
+                    ))
+
+                if data_to_insert:
+                    conn.execute("""
+                        INSERT OR REPLACE INTO tasks (
+                            task_id, form_id, created_at, salon, florist, order_type,
+                            order_id, date, period, comment, total_score, max_score,
+                            normalized_quality,
+                            catalog_match, packaging_neatness, strawberry_design,
+                            flower_processing, freshness, assembly_technique,
+                            film_separation, materials_rules, photo,
+                            synced_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, data_to_insert)
+
+                return {
+                    'saved': len(data_to_insert),
+                    'skipped': skipped,
+                    'errors': 0
+                }
+
+        except Exception as e:
+            logger.error(f"Ошибка массового сохранения задач: {e}")
+            return {
+                'saved': 0,
+                'skipped': 0,
+                'errors': len(tasks)
+            }
+
     def get_tasks(
         self,
         date_from: Optional[str] = None,

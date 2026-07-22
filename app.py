@@ -193,8 +193,8 @@ def parse_pyrus_task(task_data: dict) -> QualityTask:
                 dt = datetime.fromisoformat(created_date.replace('Z', '+00:00'))
             else:
                 dt = datetime.strptime(created_date, '%Y-%m-%d')
-            # Формат периода: "7.2026" (месяц.год)
-            period = f"{dt.month}.{dt.year}"
+            # Формат периода: "07.2026" (месяц.год с ведущим нулём)
+            period = f"{dt.month:02d}.{dt.year}"
         except:
             period = ''
 

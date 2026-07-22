@@ -102,7 +102,7 @@ def auto_sync_if_needed():
             skipped_count = 0
             error_count = 0
 
-            for task_data in tasks_data:
+            for i, task_data in enumerate(tasks_data):
                 try:
                     task = parse_pyrus_task(task_data)
 
@@ -114,6 +114,10 @@ def auto_sync_if_needed():
                         saved_count += 1
                     else:
                         error_count += 1
+
+                    # Логируем прогресс каждые 1000 задач
+                    if (i + 1) % 1000 == 0:
+                        logger.info(f"Автосинхронизация прогресс: обработано {i + 1}/{len(tasks_data)} задач, сохранено {saved_count}, пропущено {skipped_count}")
 
                 except Exception as e:
                     error_count += 1
@@ -542,7 +546,7 @@ def sync():
         skipped_count = 0
         error_count = 0
 
-        for task_data in tasks_data:
+        for i, task_data in enumerate(tasks_data):
             try:
                 task = parse_pyrus_task(task_data)
 
@@ -554,6 +558,10 @@ def sync():
                     saved_count += 1
                 else:
                     error_count += 1
+
+                # Логируем прогресс каждые 1000 задач
+                if (i + 1) % 1000 == 0:
+                    logger.info(f"Прогресс: обработано {i + 1}/{len(tasks_data)} задач, сохранено {saved_count}, пропущено {skipped_count}")
 
             except Exception as e:
                 error_count += 1

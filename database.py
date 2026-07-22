@@ -219,7 +219,7 @@ class DatabaseManager:
                     ))
 
                 if data_to_insert:
-                    conn.execute("""
+                    conn.executemany("""
                         INSERT OR REPLACE INTO tasks (
                             task_id, form_id, created_at, salon, florist, order_type,
                             order_id, date, period, comment, total_score, max_score,
